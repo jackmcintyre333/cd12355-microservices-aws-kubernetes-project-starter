@@ -1,0 +1,27 @@
+version: 0.2
+
+# Required environment variables (set in the CodeBuild project console):
+#   AWS_ACCOUNT_ID   - e.g. 422869413099
+#   IMAGE_REPO_NAME  - the ECR repository name, e.g. udacity
+# AWS_DEFAULT_REGION is provided by CodeBuild automatically.
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - export REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER ./analytics
+      - docker tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER $REPOSITORY_URI:$CODEBUILD_BUILD_NUMBER
+      - docker tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER $REPOSITORY_URI:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:$CODEBUILD_BUILD_NUMBER
+      - docker push $REPOSITORY_URI:latest
+      - echo Pushed $REPOSITORY_URI:$CODEBUILD_BUILD_NUMBER
