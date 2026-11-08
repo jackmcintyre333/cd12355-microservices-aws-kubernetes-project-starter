@@ -1,7 +1,7 @@
 version: 0.2
 
 # Required environment variables (set in the CodeBuild project console):
-#   AWS_ACCOUNT_ID   - e.g. 422869413099
+#   AWS_ACCOUNT_ID   - e.g. 029013197347
 #   IMAGE_REPO_NAME  - the ECR repository name, e.g. udacity
 # AWS_DEFAULT_REGION is provided by CodeBuild automatically.
 
